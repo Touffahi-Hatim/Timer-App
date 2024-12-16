@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hatim's Countdown Timer</title>
+    <style>
+        /* General body and timer styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-image: url('pexels-pixabay-207700.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: white;
+            margin: 0;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            color: #fff;
+            margin-bottom: 20px;
+        }
+
+        /* Circular Progress Timer Styles */
+        #timer-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: conic-gradient(#ff6f61 0%, #333 0%);
+            border: 5px solid #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: auto;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+            transition: background 0.5s ease-in-out;
+            z-index: 1;
+        }
+
+        #timer {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #ffcc00;
+            z-index: 2;
+        }
+
+        /* Styled input field */
+        input[type="number"] {
+            padding: 12px;
+            font-size: 1.5rem;
+            width: 250px;
+            margin: 20px 0;
+            border-radius: 10px;
+            border: 2px solid #ff6f61;
+            background-color: #2c2c2c;
+            color: #ffcc00;
+            text-align: center;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        input[type="number"]:focus {
+            border-color: #ffcc00;
+            outline: none;
+            box-shadow: 0 0 10px rgba(255, 204, 0, 0.8);
+        }
+
+        /* Button Styles */
+        #controls button {
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            margin: 10px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        #start {
+            background-color: #ff6f61;
+        }
+
+        #start:hover {
+            background-color: #e04f47;
+            transform: scale(1.1);
+        }
+
+        #stop {
+            background-color: #ffcc00;
+        }
+
+        #stop:hover {
+            background-color: #e6b800;
+            transform: scale(1.1);
+        }
+
+        #resume {
+            background-color: #17a2b8;
+        }
+
+        #resume:hover {
+            background-color: #138496;
+            transform: scale(1.1);
+        }
+
+        #reset {
+            background-color: #4b4b4b;
+        }
+
+        #reset:hover {
+            background-color: #3a3a3a;
+            transform: scale(1.1);
+        }
+
+        /* Controls container */
+        #controls {
+            margin-top: 30px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            body {
+                padding: 20px;
+            }
+
+            #timer-container {
+                width: 150px;
+                height: 150px;
+            }
+
+            #timer {
+                font-size: 2rem;
+            }
+
+            #controls button {
+                font-size: 1rem;
+                padding: 12px 20px;
+            }
+
+            input[type="number"] {
+                width: 80%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>You Should Focus More </h1>
+    <input type="number" id="minutes" placeholder="Enter minutes" min="1">
+    <div id="timer-container">
+        <div id="timer">00:00</div>
+    </div>
+    <div id="controls">
+        <button id="start" onclick="startCountdown()">Start</button>
+        <button id="stop" onclick="stopCountdown()">Stop</button>
+        <button id="resume" onclick="resumeCountdown()">Resume</button>
+        <button id="reset" onclick="resetCountdown()">Reset</button>
+    </div>
+
+    <script>
+        let countdownInterval;
+        let seconds = 0;
+        let totalSeconds = 0;
+        let isPaused = false; // Track if the timer is paused
+
+        function startCountdown() {
+            const minutesInput = document.getElementById("minutes").value;
+            seconds = parseInt(minutesInput) * 60;
+
+            if (isNaN(seconds) || seconds <= 0) {
+                alert("Please enter a valid number of minutes.");
+                return;
+            }
+
+            totalSeconds = seconds;
+            isPaused = false;
+            updateTimerDisplay(seconds);
+            startTimer();
+        }
+
+        function startTimer() {
+            countdownInterval = setInterval(() => {
+                if (seconds > 0) {
+                    seconds--;
+                    updateTimerDisplay(seconds);
+                    updateProgressBar(seconds);
+                } else {
+                    clearInterval(countdownInterval);
+                    document.getElementById("timer").textContent = "Time's Up!";
+                }
+            }, 1000);
+        }
+
+        function stopCountdown() {
+            clearInterval(countdownInterval);
+            isPaused = true;
+        }
+
+        function resumeCountdown() {
+            if (isPaused && seconds > 0) {
+                isPaused = false;
+                startTimer();
+            }
+        }
+
+        function resetCountdown() {
+            clearInterval(countdownInterval);
+            seconds = 0;
+            isPaused = false;
+            updateTimerDisplay(0);
+            updateProgressBar(0);
+            document.getElementById("minutes").value = "";
+        }
+
+        function updateTimerDisplay(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            document.getElementById("timer").textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function updateProgressBar(seconds) {
+            const percentage = (seconds / totalSeconds) * 100;
+            document.getElementById("timer-container").style.background = `conic-gradient(#ff6f61 ${percentage}%, #333 ${percentage}%)`;
+        }
+    </script>
+
+</body>
+</html>
